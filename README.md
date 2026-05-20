@@ -100,7 +100,7 @@ Go to Settings to:
 
 ## Live Demo
 
-Visit: https://Eilan1.github.io/habitstracker/habitstracker-v3.html
+Visit: https://eilan1.github.io/habitstracker/habitstracker-v3.html
 
 ## License
 
