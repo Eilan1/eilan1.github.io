@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Habits Tracker — Project X</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #09090b;
+  --surface: #121214;
+  --border: #27272a;
+  --border2: #3f3f46;
+  --text: #f4f4f5;
+  --muted: #71717a;
+  --dim: #52525b;
+  --faint: #18181b;
+  --font-mono: 'Courier New', monospace;
+  --radius: 12px;
+  --sidebar: 220px;
+}
+
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+
+body.light-theme {
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --border: #e5e5e5;
+  --border2: #d4d4d4;
+  --text: #1a1a1a;
+  --muted: #666666;
+  --dim: #999999;
+  --faint: #eeeeee;
+}
+
+body.theme-purple { --accent: #a855f7; --accent-light: rgba(168,85,247,0.2); }
+body.theme-blue { --accent: #3b82f6; --accent-light: rgba(59,130,246,0.2); }
+body.theme-green { --accent: #10b981; --accent-light: rgba(16,185,129,0.2); }
+body.theme-red { --accent: #ef4444; --accent-light: rgba(239,68,68,0.2); }
+body.theme-orange { --accent: #f97316; --accent-light: rgba(249,115,22,0.2); }
+body { --accent: #fff; --accent-light: rgba(255,255,255,0.1); }
+
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+.sidebar {
+  width: var(--sidebar); background: var(--surface);
+  border-right: 0.5px solid var(--border);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 24px 16px; flex-shrink: 0;
+}
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.logo-x {
+  height: 32px; width: 32px; border-radius: 8px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  color: #000; font-weight: 900; font-size: 14px;
+  box-shadow: 0 0 16px rgba(255,255,255,0.1);
+}
+.logo-title { font-weight: 700; font-size: 14px; letter-spacing: 0.12em; color: #fff; }
+body.light-theme .logo-title { color: #1a1a1a; }
+
+nav { display: flex; flex-direction: column; gap: 3px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 10px; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: none; background: transparent; color: var(--muted);
+  transition: all 0.2s; text-align: left; width: 100%;
+}
+.nav-btn:hover { color: #e4e4e7; background: rgba(39,39,42,0.5); }
+.nav-btn.active { background: var(--accent-light); color: var(--accent); border: 0.5px solid var(--accent); }
+.nav-btn i { font-size: 17px; }
+.sidebar-footer { font-size: 10px; color: #3f3f46; font-family: var(--font-mono); line-height: 1.6; }
+
+.main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.main-inner { padding: 28px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+.page-title { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+body.light-theme .page-title { color: #1a1a1a; }
+.page-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.clock-badge {
+  font-size: 11px; font-family: var(--font-mono); color: var(--muted);
+  background: var(--surface); border: 0.5px solid var(--border);
+  padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+}
+.next-reset { font-size: 10px; color: var(--dim); margin-top: 2px; text-align: right; font-family: var(--font-mono); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat-card {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 14px; padding: 16px;
+}
+.stat-label {
+  font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.08em;
+  color: var(--muted); text-transform: uppercase;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.stat-value { font-size: 26px; font-weight: 700; color: var(--accent); margin-top: 6px; letter-spacing: -0.02em; }
+.stat-sub { font-size: 12px; color: var(--dim); margin-left: 6px; font-weight: 400; }
+.progress-bar { width: 100%; background: var(--faint); height: 4px; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s ease; }
+
+.add-btn {
+  background: var(--accent); color: #000; border: none; border-radius: 10px;
+  padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: background 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+.add-btn:hover { opacity: 0.9; }
+.add-btn:active { transform: scale(0.97); }
+
+.category-filter {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.category-pill {
+  padding: 6px 12px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--border);
+  background: transparent; color: var(--muted); cursor: pointer; transition: all 0.2s;
+}
+.category-pill:hover { background: var(--surface); }
+.category-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+.habits-list { display: flex; flex-direction: column; gap: 6px; }
+.empty-state {
+  border: 0.5px dashed var(--border); border-radius: 14px;
+  padding: 40px; text-align: center; color: var(--dim); font-size: 13px;
+}
+
+.habit-wrap { position: relative; overflow: hidden; border-radius: 12px; }
+
+.habit-action-done, .habit-action-miss {
+  position: absolute; top: 0; bottom: 0; width: 100%;
+  display: flex; align-items: center; font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s;
+}
+.habit-action-done { background: rgba(16,63,28,0.85); color: #4ade80; justify-content: flex-start; padding-left: 20px; gap: 8px; }
+.habit-action-miss { background: rgba(90,20,20,0.85); color: #f87171; justify-content: flex-end; padding-right: 20px; gap: 8px; }
+
+.habit-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-radius: 12px;
+  border: 0.5px solid var(--border); background: var(--surface);
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+  cursor: grab; user-select: none; touch-action: pan-y;
+  position: relative; z-index: 1;
+  will-change: transform;
+}
+.habit-item:active { cursor: grabbing; }
+.habit-item.state-done { background: rgba(16,50,22,0.35); border-color: rgba(34,80,40,0.5); }
+.habit-item.state-missed { background: rgba(70,18,18,0.35); border-color: rgba(120,30,30,0.5); opacity: 0.7; }
+
+.habit-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.status-icon { flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.status-icon i { font-size: 20px; color: var(--dim); transition: color 0.2s; }
+.state-done .status-icon i { color: #4ade80; }
+.state-missed .status-icon i { color: #f87171; }
+
+.habit-info { min-width: 0; flex: 1; }
+.habit-name {
+  font-size: 13px; font-weight: 500; color: #e4e4e7;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+body.light-theme .habit-name { color: #1a1a1a; }
+.state-done .habit-name { text-decoration: line-through; color: var(--dim); }
+.state-missed .habit-name { color: var(--dim); }
+
+.habit-meta { font-size: 11px; color: var(--dim); margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+.habit-category { background: var(--accent-light); color: var(--accent); padding: 2px 6px; border-radius: 4px; }
+.habit-difficulty {
+  display: inline-flex; gap: 1px;
+}
+.difficulty-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); }
+.difficulty-dot.active { background: var(--accent); }
+
+.habit-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.streak-badge {
+  display: flex; align-items: center; gap: 5px; padding: 4px 8px;
+  border-radius: 7px; font-size: 11px; font-family: var(--font-mono); font-weight: 600;
+}
+.streak-badge.hot { background: rgba(67,20,7,0.4); color: #fb923c; border: 0.5px solid rgba(154,52,18,0.3); }
+.streak-badge.cold { background: var(--faint); color: var(--dim); border: 0.5px solid var(--border); }
+.streak-badge i { font-size: 12px; }
+
+.miss-badge {
+  display: flex; align-items: center; gap: 4px; padding: 4px 8px;
+  border-radius: 7px; font-size: 11px; font-family: var(--font-mono); font-weight: 600;
+  background: rgba(70,18,18,0.3); color: #f87171; border: 0.5px solid rgba(120,30,30,0.3);
+}
+.miss-badge i { font-size: 12px; }
+
+.del-btn, .edit-btn, .reminder-btn, .note-btn {
+  background: none; border: none; cursor: pointer; color: #3f3f46;
+  padding: 4px 6px; border-radius: 7px; transition: all 0.2s; display: flex;
+}
+.del-btn:hover { color: #f87171; background: var(--faint); }
+.edit-btn:hover { color: #60a5fa; background: var(--faint); }
+.reminder-btn:hover { color: #fbbf24; background: var(--faint); }
+.note-btn:hover { color: var(--accent); background: var(--faint); }
+.del-btn i, .edit-btn i, .reminder-btn i, .note-btn i { font-size: 14px; }
+
+.analytics-table {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+}
+.analytics-header {
+  padding: 14px 18px; border-bottom: 0.5px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+}
+.analytics-header span:first-child { font-size: 11px; font-family: var(--font-mono); letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.analytics-header span:last-child { font-size: 11px; color: var(--dim); font-family: var(--font-mono); }
+.analytics-row {
+  padding: 14px 18px; display: flex; justify-content: space-between;
+  align-items: center; border-bottom: 0.5px solid var(--faint);
+}
+.analytics-row:last-child { border-bottom: none; }
+.ar-name { font-size: 13px; font-weight: 500; color: #e4e4e7; }
+body.light-theme .ar-name { color: #1a1a1a; }
+.ar-id { font-size: 11px; color: var(--dim); font-family: var(--font-mono); margin-top: 2px; }
+.ar-right { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.ar-cycles { font-size: 13px; font-weight: 700; color: var(--accent); }
+.ar-label { font-size: 11px; color: var(--dim); font-family: var(--font-mono); }
+.ar-missed { font-size: 11px; color: #f87171; font-family: var(--font-mono); }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
+  background: var(--surface); border: 0.5px solid var(--border);
+  color: var(--text); font-size: 13px; padding: 10px 18px; border-radius: 10px;
+  pointer-events: none; transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0; z-index: 999; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(52,168,83,0.3); background: rgba(16,63,28,0.5); }
+.toast.error { border-color: rgba(220,38,38,0.3); background: rgba(70,18,18,0.5); }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  overflow-y: auto;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border: 0.5px solid var(--border2);
+  border-radius: 16px; padding: 24px; width: 380px; min-height: 200px;
+  transform: scale(0.95); transition: transform 0.2s; margin: 20px;
+}
+.modal-overlay.show .modal { transform: scale(1); }
+.modal-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+body.light-theme .modal-title { color: #1a1a1a; }
+.modal-input, .modal-textarea, .modal-select {
+  width: 100%; background: var(--bg); border: 0.5px solid var(--border2);
+  border-radius: 10px; padding: 10px 14px; font-size: 13px;
+  color: #fff; outline: none; font-family: inherit; margin-bottom: 14px;
+}
+body.light-theme .modal-input, body.light-theme .modal-textarea, body.light-theme .modal-select { color: #1a1a1a; }
+.modal-textarea { resize: vertical; min-height: 80px; }
+.modal-input:focus, .modal-textarea:focus, .modal-select:focus { border-color: var(--accent); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-cancel {
+  background: none; border: 0.5px solid var(--border); color: var(--muted);
+  padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer;
+  transition: all 0.15s;
+}
+.modal-cancel:hover { color: var(--text); border-color: var(--border2); }
+.modal-confirm {
+  background: var(--accent); color: #000; border: none;
+  padding: 8px 16px; border-radius: 8px; font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+}
+.modal-confirm:hover { opacity: 0.9; }
+
+.toggle-switch {
+  display: inline-flex; align-items: center; cursor: pointer; user-select: none;
+}
+.toggle-switch input { display: none; }
+.toggle-slider {
+  width: 44px; height: 24px; background: var(--dim); border-radius: 12px;
+  position: relative; transition: background 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent);
+}
+.toggle-slider::after {
+  content: ''; position: absolute; width: 20px; height: 20px;
+  background: white; border-radius: 50%; top: 2px; left: 2px;
+  transition: left 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider::after {
+  left: 22px;
+}
+
+.settings-group {
+  background: var(--surface); border: 0.5px solid var(--border);
+  border-radius: 14px; padding: 16px; margin-bottom: 12px;
+}
+.settings-group-title {
+  font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+body.light-theme .settings-group-title { color: #1a1a1a; }
+.settings-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 0.5px solid var(--faint);
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-label {
+  font-size: 13px; color: var(--text);
+}
+body.light-theme .settings-label { color: #1a1a1a; }
+.settings-desc {
+  font-size: 11px; color: var(--dim); margin-top: 2px;
+}
+
+.color-picker {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.color-option {
+  width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; transition: all 0.2s;
+}
+.color-option:hover { transform: scale(1.1); }
+.color-option.active { border-color: #fff; }
+
+.achievement-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 8px; background: var(--accent-light);
+  color: var(--accent); font-size: 20px; margin: 4px;
+  border: 0.5px solid var(--accent); cursor: pointer; position: relative;
+}
+.achievement-badge:hover::after {
+  content: attr(data-name); position: absolute; bottom: 100%; background: var(--surface);
+  border: 0.5px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 10px;
+  white-space: nowrap; color: var(--text); z-index: 10;
+}
+
+@media (max-width: 768px) {
+  :root { --sidebar: 0; }
+  .sidebar { display: none; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .modal { width: 90vw; max-width: 380px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <div class="logo-x">X</div>
+        <span class="logo-title">PROJECT X</span>
+      </div>
+      <nav>
+        <button class="nav-btn active" id="btn-dashboard" onclick="setTab('dashboard')">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
+        </button>
+        <button class="nav-btn" id="btn-stats" onclick="setTab('stats')">
+          <i class="ti ti-trophy" aria-hidden="true"></i> Stats
+        </button>
+        <button class="nav-btn" id="btn-analytics" onclick="setTab('analytics')">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> Analytics
+        </button>
+        <button class="nav-btn" id="btn-settings" onclick="setTab('settings')">
+          <i class="ti ti-settings" aria-hidden="true"></i> Settings
+        </button>
+      </nav>
+    </div>
+    <div class="sidebar-footer" id="sidebar-footer">
+      HABITS_TRACKER // VER_3.0
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-inner" id="main-content"></div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add Habit</div>
+    <input class="modal-input" id="modal-name" placeholder="Habit name..." maxlength="60" />
+    <select class="modal-select" id="modal-category">
+      <option value="">Select category...</option>
+      <option value="Health">Health</option>
+      <option value="Work">Work</option>
+      <option value="Learning">Learning</option>
+      <option value="Fitness">Fitness</option>
+      <option value="Mental">Mental</option>
+      <option value="Social">Social</option>
+      <option value="Creative">Creative</option>
+      <option value="Other">Other</option>
+    </select>
+    <select class="modal-select" id="modal-difficulty">
+      <option value="1">Easy</option>
+      <option value="2">Medium</option>
+      <option value="3">Hard</option>
+    </select>
+    <textarea class="modal-textarea" id="modal-notes" placeholder="Notes (optional)..." maxlength="200"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeHabitModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmAddEdit()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reminder-modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Set Reminder</div>
+    <select class="modal-select" id="reminder-select">
+      <option value="">No reminder</option>
+      <option value="5">5 minutes</option>
+      <option value="15">15 minutes</option>
+      <option value="30">30 minutes</option>
+      <option value="60">1 hour</option>
+      <option value="120">2 hours</option>
+      <option value="480">8 hours</option>
+      <option value="1440">1 day</option>
+    </select>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="modal-cancel" onclick="closeReminderModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmReminder()">Set</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="note-modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Add Note</div>
+    <textarea class="modal-textarea" id="note-input" placeholder="How did it go?" maxlength="200"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeNoteModal()">Cancel</button>
+      <button class="modal-confirm" onclick="confirmNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="delete-modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Delete Habit?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="modal-confirm" style="background:#f87171;color:#fff;" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'habitstracker_v3';
+const SETTINGS_KEY = 'habitstracker_settings_v3';
+const today = () => new Date().toISOString().slice(0, 10);
+
+let settings = (() => {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
+      lightTheme: false, skipDeleteConfirm: false, accentColor: 'white', soundEnabled: true
+    };
+  } catch(e) { return { lightTheme: false, skipDeleteConfirm: false, accentColor: 'white', soundEnabled: true }; }
+})();
+
+function saveSettings() {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch(e) {}
+}
+
+let state = (() => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    habits: [
+      { id: 1, name: 'Coding', category: 'Work', difficulty: 2, streak: 5, status: 'done', totalDone: 24, totalMissed: 2, reminder: null, notes: [], createdAt: today(), achievements: 0 },
+      { id: 2, name: 'Meditation', category: 'Mental', difficulty: 1, streak: 12, status: 'pending', totalDone: 45, totalMissed: 1, reminder: null, notes: [], createdAt: today(), achievements: 0 },
+      { id: 3, name: 'Gym', category: 'Fitness', difficulty: 3, streak: 0, status: 'pending', totalDone: 8, totalMissed: 4, reminder: null, notes: [], createdAt: today(), achievements: 0 }
+    ],
+    lastDate: today()
+  };
+})();
+
+let habits = state.habits;
+let activeTab = 'dashboard';
+let editingHabitId = null;
+let reminderHabitId = null;
+let noteHabitId = null;
+let deleteConfirmId = null;
+let reminderTimeouts = {};
+let filterCategory = null;
+
+function applyTheme() {
+  if (settings.lightTheme) document.body.classList.add('light-theme');
+  else document.body.classList.remove('light-theme');
+  
+  document.body.classList.remove('theme-purple', 'theme-blue', 'theme-green', 'theme-red', 'theme-orange');
+  if (settings.accentColor && settings.accentColor !== 'white') {
+    document.body.classList.add(`theme-${settings.accentColor}`);
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ habits, lastDate: state.lastDate }));
+  } catch(e) {}
+}
+
+function checkDayReset() {
+  const now = today();
+  if (state.lastDate !== now) {
+    habits = habits.map(h => {
+      if (h.status === 'pending') {
+        return { ...h, status: 'pending', totalMissed: (h.totalMissed || 0) + 1, streak: 0 };
+      }
+      return { ...h, status: 'pending', reminder: null };
+    });
+    state.lastDate = now;
+    saveState();
+    showToast('New day - habits reset', 'success');
+  }
+}
+
+function scheduleReset() {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const ms = midnight - now;
+  setTimeout(() => { checkDayReset(); render(); scheduleReset(); }, ms);
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function formatCountdown() {
+  const now = new Date();
+  const midnight = new Date(now); midnight.setHours(24,0,0,0);
+  const diff = midnight - now;
+  const h = String(Math.floor(diff/3600000)).padStart(2,'0');
+  const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+
+let clockInterval;
+function startClock() {
+  if (clockInterval) clearInterval(clockInterval);
+  clockInterval = setInterval(() => {
+    const el = document.getElementById('live-clock');
+    const cd = document.getElementById('live-countdown');
+    if (el) el.textContent = formatTime(new Date());
+    if (cd) cd.textContent = `RESET IN ${formatCountdown()}`;
+  }, 1000);
+}
+
+let toastTimer;
+function showToast(msg, type = 'default') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show', 'success', 'error');
+  t.classList.add(type);
+  clearTimeout(toastTimer);
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  if (settings.soundEnabled) playSound();
+}
+
+function playSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 800;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.1);
+  } catch(e) {}
+}
+
+function openHabitModal(habitId = null) {
+  editingHabitId = habitId;
+  const nameInput = document.getElementById('modal-name');
+  const categorySelect = document.getElementById('modal-category');
+  const difficultySelect = document.getElementById('modal-difficulty');
+  const notesInput = document.getElementById('modal-notes');
+  const title = document.getElementById('modal-title');
+  
+  if (habitId) {
+    const habit = habits.find(h => h.id === habitId);
+    if (habit) {
+      nameInput.value = habit.name;
+      categorySelect.value = habit.category || '';
+      difficultySelect.value = habit.difficulty || 1;
+      notesInput.value = habit.notes ? habit.notes[0] : '';
+      title.textContent = 'Edit Habit';
+    }
+  } else {
+    nameInput.value = '';
+    categorySelect.value = '';
+    difficultySelect.value = 1;
+    notesInput.value = '';
+    title.textContent = 'Add Habit';
+  }
+  
+  document.getElementById('modal-overlay').classList.add('show');
+  setTimeout(() => nameInput.focus(), 150);
+}
+
+function closeHabitModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  editingHabitId = null;
+}
+
+function confirmAddEdit() {
+  const name = document.getElementById('modal-name').value.trim();
+  const category = document.getElementById('modal-category').value;
+  const difficulty = parseInt(document.getElementById('modal-difficulty').value);
+  const notes = document.getElementById('modal-notes').value.trim();
+  
+  if (!name) {
+    showToast('Habit name required', 'error');
+    return;
+  }
+
+  if (editingHabitId) {
+    habits = habits.map(h => h.id === editingHabitId 
+      ? { ...h, name, category, difficulty, notes: notes ? [notes] : h.notes }
+      : h);
+    showToast('Habit updated', 'success');
+  } else {
+    habits.push({
+      id: Date.now(), name, category, difficulty, streak: 0, status: 'pending',
+      totalDone: 0, totalMissed: 0, reminder: null, notes: notes ? [notes] : [], createdAt: today(), achievements: 0
+    });
+    showToast(`"${name}" added`, 'success');
+  }
+
+  saveState();
+  closeHabitModal();
+  render();
+}
+
+function openReminderModal(habitId) {
+  reminderHabitId = habitId;
+  const habit = habits.find(h => h.id === habitId);
+  document.getElementById('reminder-select').value = habit?.reminder || '';
+  document.getElementById('reminder-modal-overlay').classList.add('show');
+}
+
+function closeReminderModal() {
+  document.getElementById('reminder-modal-overlay').classList.remove('show');
+}
+
+function confirmReminder() {
+  const minutes = document.getElementById('reminder-select').value;
+  habits = habits.map(h => h.id === reminderHabitId ? { ...h, reminder: minutes ? parseInt(minutes) : null } : h);
+  
+  if (reminderTimeouts[reminderHabitId]) clearTimeout(reminderTimeouts[reminderHabitId]);
+  
+  if (minutes) {
+    const ms = parseInt(minutes) * 60 * 1000;
+    reminderTimeouts[reminderHabitId] = setTimeout(() => {
+      const habit = habits.find(h => h.id === reminderHabitId);
+      if (habit) {
+        showToast(`Reminder: ${habit.name}`, 'success');
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Habit Reminder', { body: `Time for: ${habit.name}` });
+        }
+      }
+    }, ms);
+    showToast('Reminder set', 'success');
+  }
+  
+  saveState();
+  closeReminderModal();
+  render();
+}
+
+function openNoteModal(habitId) {
+  noteHabitId = habitId;
+  document.getElementById('note-input').value = '';
+  document.getElementById('note-modal-overlay').classList.add('show');
+}
+
+function closeNoteModal() {
+  document.getElementById('note-modal-overlay').classList.remove('show');
+}
+
+function confirmNote() {
+  const note = document.getElementById('note-input').value.trim();
+  if (!note) return;
+  
+  habits = habits.map(h => {
+    if (h.id === noteHabitId) {
+      const updatedNotes = [note, ...h.notes].slice(0, 5);
+      return { ...h, notes: updatedNotes };
+    }
+    return h;
+  });
+  
+  saveState();
+  closeNoteModal();
+  render();
+  showToast('Note saved', 'success');
+}
+
+function openDeleteModal(id) {
+  if (settings.skipDeleteConfirm) {
+    deleteHabit(id);
+  } else {
+    deleteConfirmId = id;
+    document.getElementById('delete-modal-overlay').classList.add('show');
+  }
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal-overlay').classList.remove('show');
+}
+
+function confirmDelete() {
+  if (deleteConfirmId) deleteHabit(deleteConfirmId);
+  closeDeleteModal();
+}
+
+function deleteHabit(id) {
+  const habitName = habits.find(h => h.id === id)?.name || 'Habit';
+  habits = habits.filter(h => h.id !== id);
+  if (reminderTimeouts[id]) clearTimeout(reminderTimeouts[id]);
+  delete reminderTimeouts[id];
+  saveState();
+  render();
+  showToast(`"${habitName}" deleted`, 'success');
+}
+
+function markDone(id) {
+  habits = habits.map(h => {
+    if (h.id !== id) return h;
+    if (h.status === 'done') return h;
+    const newAchievements = h.achievements + (h.streak + 1 === 7 ? 1 : 0) + (h.streak + 1 === 30 ? 1 : 0) + (h.streak + 1 === 100 ? 1 : 0);
+    return { ...h, status: 'done', streak: h.streak + 1, totalDone: h.totalDone + 1, reminder: null, achievements: newAchievements };
+  });
+  saveState(); render();
+}
+
+function markMissed(id) {
+  habits = habits.map(h => {
+    if (h.id !== id) return h;
+    if (h.status === 'missed') return h;
+    const wasDone = h.status === 'done';
+    return { ...h, status: 'missed', streak: 0, totalDone: wasDone ? Math.max(0, h.totalDone - 1) : h.totalDone, totalMissed: h.totalMissed + 1, reminder: null };
+  });
+  saveState(); render();
+}
+
+function attachSwipe(el, id) {
+  let startX = 0, startY = 0, dx = 0, dragging = false;
+  const THRESHOLD = 80;
+  const doneReveal = el.querySelector('.habit-action-done');
+  const missReveal = el.querySelector('.habit-action-miss');
+  const item = el.querySelector('.habit-item');
+
+  function onStart(x, y) { startX = x; startY = y; dragging = true; dx = 0; }
+  function onMove(x, y) {
+    if (!dragging) return;
+    dx = x - startX;
+    const dy = y - startY;
+    if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 10) { dragging = false; return; }
+    const clamped = Math.max(-160, Math.min(160, dx));
+    item.style.transform = `translateX(${clamped}px)`;
+    const ratio = Math.min(Math.abs(clamped) / THRESHOLD, 1);
+    if (clamped > 0) { doneReveal.style.opacity = ratio; missReveal.style.opacity = 0; }
+    else { missReveal.style.opacity = ratio; doneReveal.style.opacity = 0; }
+  }
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false;
+    item.style.transition = 'transform 0.25s ease';
+    item.style.transform = 'translateX(0)';
+    doneReveal.style.opacity = 0; missReveal.style.opacity = 0;
+    setTimeout(() => { item.style.transition = ''; }, 260);
+    if (dx > THRESHOLD) markDone(id);
+    else if (dx < -THRESHOLD) markMissed(id);
+  }
+
+  el.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => { if (dragging) onMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => { if (dragging) onEnd(); });
+  el.addEventListener('touchstart', e => { const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: true });
+  el.addEventListener('touchmove', e => { const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
+  el.addEventListener('touchend', onEnd);
+}
+
+function getStats() {
+  const total = habits.length;
+  const done = habits.filter(h => h.status === 'done').length;
+  const missed = habits.filter(h => h.status === 'missed').length;
+  const rate = total > 0 ? Math.round((done / total) * 100) : 0;
+  const maxStreak = habits.length > 0 ? Math.max(...habits.map(h => h.streak)) : 0;
+  const bestHabit = habits.reduce((best, h) => h.totalDone > (best?.totalDone || 0) ? h : best, null);
+  return { total, done, missed, rate, maxStreak, bestHabit };
+}
+
+function getCategories() {
+  return [...new Set(habits.map(h => h.category).filter(Boolean))];
+}
+
+function getDifficultyStars(difficulty) {
+  return 'O'.repeat(difficulty) + '○'.repeat(3 - difficulty);
+}
+
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function exportData() {
+  const dataStr = JSON.stringify({ habits, settings, exported: new Date().toISOString() }, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `habitstracker-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported', 'success');
+}
+
+function setTab(tab) {
+  activeTab = tab;
+  ['dashboard', 'stats', 'analytics', 'settings'].forEach(t => {
+    document.getElementById(`btn-${t}`)?.classList.toggle('active', tab === t);
+  });
+  render();
+}
+
+function render() {
+  const { total, done, missed, rate, maxStreak, bestHabit } = getStats();
+  const main = document.getElementById('main-content');
+  const categories = getCategories();
+  const filteredHabits = filterCategory ? habits.filter(h => h.category === filterCategory) : habits;
+
+  if (activeTab === 'dashboard') {
+    main.innerHTML = `
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Track your daily habits</div>
+        </div>
+        <div>
+          <div class="clock-badge" id="live-clock">${formatTime(new Date())}</div>
+          <div class="next-reset" id="live-countdown">RESET IN ${formatCountdown()}</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Completion Rate</div>
+          <div class="stat-value">${rate}%</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${rate}%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completed Today</div>
+          <div class="stat-value">${done}/${total}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Max Streak</div>
+          <div class="stat-value">${maxStreak} days</div>
+        </div>
+      </div>
+
+      ${categories.length > 0 ? `
+      <div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Filter by category</div>
+        <div class="category-filter">
+          <button class="category-pill ${filterCategory === null ? 'active' : ''}" onclick="filterCategory=null;render()">All</button>
+          ${categories.map(cat => `<button class="category-pill ${filterCategory === cat ? 'active' : ''}" onclick="filterCategory='${cat}';render()">${cat}</button>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase;">Habits - ${filteredHabits.length}</span>
+        <button class="add-btn" onclick="openHabitModal()" style="padding:8px 14px;font-size:12px;">
+          <i class="ti ti-plus" aria-hidden="true"></i> Add
+        </button>
+      </div>
+
+      <div class="habits-list">
+        ${filteredHabits.length === 0
+          ? '<div class="empty-state">No habits yet. Start tracking</div>'
+          : filteredHabits.map(h => `
+            <div class="habit-wrap" id="wrap-${h.id}">
+              <div class="habit-action-done"><i class="ti ti-check" aria-hidden="true"></i> DONE</div>
+              <div class="habit-action-miss"><i class="ti ti-x" aria-hidden="true"></i> MISS</div>
+              <div class="habit-item state-${h.status}">
+                <div class="habit-left">
+                  <div class="status-icon">
+                    <i class="ti ti-${h.status==='done'?'circle-check':h.status==='missed'?'circle-x':'circle'}" aria-hidden="true"></i>
+                  </div>
+                  <div class="habit-info">
+                    <div class="habit-name">${escapeHtml(h.name)}</div>
+                    <div class="habit-meta">
+                      ${h.category ? `<span class="habit-category">${h.category}</span>` : ''}
+                      <span class="habit-difficulty">${getDifficultyStars(h.difficulty)}</span>
+                      ${h.notes.length > 0 ? `<span title="${escapeHtml(h.notes[0])}" style="cursor:pointer;">Note</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+                <div class="habit-right">
+                  ${h.status==='missed'
+                    ? `<div class="miss-badge"><i class="ti ti-x" aria-hidden="true"></i></div>`
+                    : `<div class="streak-badge ${h.streak>0?'hot':'cold'}"><i class="ti ti-flame" aria-hidden="true"></i> ${h.streak}d</div>`
+                  }
+                  <button class="note-btn" onclick="openNoteModal(${h.id})" title="Add note"><i class="ti ti-notebook" aria-hidden="true"></i></button>
+                  <button class="reminder-btn" onclick="openReminderModal(${h.id})" title="Set reminder"><i class="ti ti-bell${h.reminder?'-ringing':''}" aria-hidden="true"></i></button>
+                  <button class="edit-btn" onclick="openHabitModal(${h.id})" title="Edit"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                  <button class="del-btn" onclick="openDeleteModal(${h.id})" title="Delete"><i class="ti ti-trash" aria-hidden="true"></i></button>
+                </div>
+              </div>
+            </div>`).join('')
+        }
+      </div>
+    `;
+
+    filteredHabits.forEach(h => {
+      const wrap = document.getElementById(`wrap-${h.id}`);
+      if (wrap) attachSwipe(wrap, h.id);
+    });
+
+  } else if (activeTab === 'stats') {
+    const achievements = [
+      { icon: 'F', name: '7-Day Streak', check: h => h.streak >= 7 },
+      { icon: '*', name: '30-Day Streak', check: h => h.streak >= 30 },
+      { icon: '#', name: '100-Day Streak', check: h => h.streak >= 100 },
+      { icon: 'T', name: 'Perfect Week', check: h => h.totalDone >= 7 },
+      { icon: 'C', name: 'Century', check: h => h.totalDone >= 100 },
+      { icon: 'X', name: 'Champion', check: h => h.totalDone >= 50 }
+    ];
+
+    const habitsRanked = [...habits].sort((a, b) => b.streak - a.streak);
+
+    main.innerHTML = `
+      <div class="page-title">Stats and Awards</div>
+      <div class="page-sub">Your achievements and rankings</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Completions</div>
+          <div class="stat-value">${habits.reduce((a, h) => a + h.totalDone, 0)}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best Habit</div>
+          <div class="stat-value" style="font-size:14px;">${bestHabit ? bestHabit.name : 'N/A'}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Misses</div>
+          <div class="stat-value" style="color:#f87171">${habits.reduce((a, h) => a + h.totalMissed, 0)}</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Achievements</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          ${achievements.map((ach, i) => {
+            const earned = habits.some(ach.check);
+            return `<div class="achievement-badge" data-name="${ach.name}" style="opacity:${earned ? 1 : 0.3}">${ach.icon}</div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:16px;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Streak Rankings</div>
+        ${habitsRanked.map((h, i) => `
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--faint);font-size:12px;">
+            <span>${i+1}. ${escapeHtml(h.name)}</span>
+            <span style="color:var(--accent);font-weight:600;">${h.streak}d</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+  } else if (activeTab === 'analytics') {
+    const totalDone = habits.reduce((a, h) => a + h.totalDone, 0);
+    const totalMissed = habits.reduce((a, h) => a + h.totalMissed, 0);
+
+    main.innerHTML = `
+      <div class="page-title">Analytics</div>
+      <div class="page-sub">Detailed performance metrics</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Cycles</div>
+          <div class="stat-value">${totalDone}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Success Rate</div>
+          <div class="stat-value">${totalDone + totalMissed > 0 ? Math.round(totalDone / (totalDone + totalMissed) * 100) : 0}%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Misses</div>
+          <div class="stat-value" style="color:#f87171">${totalMissed}</div>
+        </div>
+      </div>
+
+      <div class="analytics-table">
+        <div class="analytics-header">
+          <span>Habit Performance</span>
+          <span>${total} habits</span>
+        </div>
+        ${habits.length === 0 ? '<div style="padding:32px;text-align:center;font-size:13px;color:#52525b;">No data available</div>'
+          : habits.map(h => `
+            <div class="analytics-row">
+              <div>
+                <div class="ar-name">${escapeHtml(h.name)}</div>
+                <div class="ar-id">${h.category} - ${getDifficultyStars(h.difficulty)}</div>
+              </div>
+              <div class="ar-right">
+                <div class="ar-cycles">${h.totalDone} done</div>
+                <div class="ar-missed"><i class="ti ti-x" style="font-size:10px" aria-hidden="true"></i> ${h.totalMissed} missed</div>
+              </div>
+            </div>`).join('')
+        }
+      </div>
+    `;
+
+  } else if (activeTab === 'settings') {
+    main.innerHTML = `
+      <div class="page-title">Settings</div>
+      <div class="page-sub">Customize your experience</div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Theme</div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Dark Mode</div>
+            <div class="settings-desc">Use dark theme</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${!settings.lightTheme ? 'checked' : ''} onchange="settings.lightTheme=!settings.lightTheme;saveSettings();applyTheme();render()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Accent Color</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px;">
+          ${['white', 'purple', 'blue', 'green', 'red', 'orange'].map(color => `
+            <div class="color-option ${settings.accentColor === color ? 'active' : ''}" 
+              style="background:${color === 'white' ? '#fff' : color === 'purple' ? '#a855f7' : color === 'blue' ? '#3b82f6' : color === 'green' ? '#10b981' : color === 'red' ? '#ef4444' : '#f97316'}"
+              onclick="settings.accentColor='${color}';saveSettings();applyTheme();render()"></div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Delete</div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Skip Confirmation</div>
+            <div class="settings-desc">Delete instantly without prompt</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${settings.skipDeleteConfirm ? 'checked' : ''} onchange="settings.skipDeleteConfirm=!settings.skipDeleteConfirm;saveSettings()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Sound</div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Sound Effects</div>
+            <div class="settings-desc">Enable notification sounds</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${settings.soundEnabled ? 'checked' : ''} onchange="settings.soundEnabled=!settings.soundEnabled;saveSettings()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Data</div>
+        <div class="settings-item">
+          <div>
+            <div class="settings-label">Export Data</div>
+            <div class="settings-desc">Download JSON backup</div>
+          </div>
+          <button class="add-btn" onclick="exportData()" style="padding:8px 12px;font-size:12px;">
+            <i class="ti ti-file-download" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">About</div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);line-height:1.8;">
+          Habits Tracker v3.0<br>
+          Advanced habit tracking<br>
+          <br>
+          Features:<br>
+          - Categories and difficulty levels<br>
+          - Reminders and notifications<br>
+          - Notes and history<br>
+          - Achievements and streaks<br>
+          - Custom themes<br>
+          - Full data export
+        </div>
+      </div>
+    `;
+  }
+}
+
+applyTheme();
+checkDayReset();
+scheduleReset();
+startClock();
+if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+render();
+</script>
+</body>
+</html>
