@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habits Tracker — Project X</title>
+  <link rel="stylesheet" href="https://jsdelivr.net" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #121214;
+      --border: #27272a;
+      --border2: #3f3f46;
+      --text: #f4f4f5;
+      --muted: #71717a;
+      --dim: #52525b;
+      --faint: #18181b;
+      --font-mono: 'Courier New', monospace;
+      --radius: 12px;
+      --sidebar: 220px;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+
+    body.light-theme {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --border: #e5e5e5;
+      --border2: #d4d4d4;
+      --text: #1a1a1a;
+      --muted: #666666;
+      --dim: #999999;
+      --faint: #eeeeee;
+    }
+
+    body.theme-purple { --accent: #a855f7; --accent-light: rgba(168,85,247,0.2); }
+    body.theme-blue { --accent: #3b82f6; --accent-light: rgba(59,130,246,0.2); }
+    body.theme-green { --accent: #10b981; --accent-light: rgba(16,185,129,0.2); }
+    body.theme-red { --accent: #ef4444; --accent-light: rgba(239,68,68,0.2); }
+    body.theme-orange { --accent: #f97316; --accent-light: rgba(249,115,22,0.2); }
+    body { --accent: #a855f7; --accent-light: rgba(168,85,247,0.2); }
+
+    .app { display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar {
+      width: var(--sidebar); background: var(--surface);
+      border-right: 0.5px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 24px 16px; flex-shrink: 0;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+    .logo-x {
+      height: 32px; width: 32px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      color: #000; font-weight: 900; font-size: 14px;
+      box-shadow: 0 0 16px rgba(255,255,255,0.1);
+    }
+    .logo-title { font-weight: 700; font-size: 14px; letter-spacing: 0.12em; color: #fff; }
+    body.light-theme .logo-title { color: #1a1a1a; }
+
+    nav { display: flex; flex-direction: column; gap: 3px; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      border-radius: 10px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: transparent; color: var(--muted);
+      transition: all 0.2s; text-align: left; width: 100%;
+    }
+    .nav-btn:hover { color: #e4e4e7; background: rgba(39,39,42,0.5); }
+    .nav-btn.active { background: var(--accent-light); color: var(--accent); border: 0.5px solid var(--accent); }
+    .nav-btn i { font-size: 17px; }
+    .sidebar-footer { font-size: 10px; color: #3f3f46; font-family: var(--font-mono); line-height: 1.6; margin-top: auto; padding-top: 20px; }
+
+    .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .main-inner { padding: 28px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 15px; }
+    .page-title { font-size: 26px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    body.light-theme .page-title { color: #1a1a1a; }
+    .page-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .clock-badge {
+      font-size: 11px; font-family: var(--font-mono); color: var(--muted);
+      background: var(--surface); border: 0.5px solid var(--border);
+      padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+    }
+    .next-reset { font-size: 10px; color: var(--dim); margin-top: 2px; text-align: right; font-family: var(--font-mono); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .stat-card {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 14px; padding: 16px;
+    }
+    .stat-label {
+      font-size: 10px; font-family: var(--font-mono); letter-spacing: 0.08em;
+      color: var(--muted); text-transform: uppercase;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .stat-value { font-size: 26px; font-weight: 700; color: var(--accent); margin-top: 6px; letter-spacing: -0.02em; }
+    .stat-sub { font-size: 12px; color: var(--dim); margin-left: 6px; font-weight: 400; }
+    .progress-bar { width: 100%; background: var(--faint); height: 4px; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s ease; }
+
+    .add-btn {
+      background: var(--accent); color: #000; border: none; border-radius: 10px;
+      padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+    .add-btn:hover { opacity: 0.9; }
+    .add-btn:active { transform: scale(0.97); }
+
+    .category-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .category-pill {
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; transition: all 0.2s;
+    }
+    .category-pill:hover { background: var(--surface); }
+    .category-pill.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    .habits-list { display: flex; flex-direction: column; gap: 6px; }
+    .empty-state {
+      border: 0.5px dashed var(--border); border-radius: 14px;
+      padding: 40px; text-align: center; color: var(--dim); font-size: 13px;
+    }
+
+    .habit-wrap { position: relative; overflow: hidden; border-radius: 12px; }
+
+    .habit-action-done, .habit-action-miss {
+      position: absolute; top: 0; bottom: 0; width: 100%;
+      display: flex; align-items: center; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .habit-action-done { background: rgba(16,63,28,0.85); color: #4ade80; justify-content: flex-start; padding-left: 20px; gap: 8px; }
+    .habit-action-miss { background: rgba(90,20,20,0.85); color: #f87171; justify-content: flex-end; padding-right: 20px; gap: 8px; }
+
+    .habit-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-radius: 12px;
+      border: 0.5px solid var(--border); background: var(--surface);
+      transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+      cursor: grab; user-select: none; touch-action: pan-y;
+      position: relative; z-index: 1; will-change: transform;
+    }
+    .habit-item:active { cursor: grabbing; }
+    .habit-item.state-done { background: rgba(16,50,22,0.35); border-color: rgba(34,80,40,0.5); }
+    .habit-item.state-missed { background: rgba(70,18,18,0.35); border-color: rgba(120,30,30,0.5); opacity: 0.7; }
+
+    .habit-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    .status-icon { flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .status-icon i { font-size: 20px; color: var(--dim); transition: color 0.2s; }
+    .state-done .status-icon i { color: #4ade80; }
+    .state-missed .status-icon i { color: #f87171; }
+
+    .habit-info { min-width: 0; flex: 1; }
+    .habit-name {
+      font-size: 13px; font-weight: 500; color: #e4e4e7;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    body.light-theme .habit-name { color: #1a1a1a; }
+    .state-done .habit-name { text-decoration: line-through; color: var(--dim); }
+    .state-missed .habit-name { color: var(--dim); }
+
+    .habit-meta { font-size: 11px; color: var(--dim); margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+    .habit-category { background: var(--accent-light); color: var(--accent); padding: 2px 6px; border-radius: 4px; text-transform: capitalize; }
+    .habit-difficulty { display: inline-flex; gap: 1px; }
+    .difficulty-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--dim); }
+    .difficulty-dot.active { background: var(--accent); }
+
+    .habit-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .streak-badge {
+      display: flex; align-items: center; gap: 5px; padding: 4px 8px;
+      border-radius: 7px; font-size: 11px; font-family: var(--font-mono); font-weight: 600;
+    }
+    .streak-badge.hot { background: rgba(67,20,7,0.4); color: #fb923c; border: 0.5px solid rgba(251,146,60,0.3); }
+    .streak-badge.cold { background: var(--faint); color: var(--muted); border: 0.5px solid var(--border); }
+    
+    .delete-btn {
+      background: transparent; border: none; color: var(--dim); cursor: pointer;
+      padding: 4px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center;
+    }
+    .delete-btn:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); display: flex; align-items: center;
+      justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal.open { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: var(--surface); border: 0.5px solid var(--border);
+      width: 90%; max-width: 400px; padding: 24px; border-radius: 14px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; color: #fff; }
+    body.light-theme .modal-title { color: #1a1a1a; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 11px; font-family: var(--font-mono); color: var(--muted); text-transform: uppercase; }
+    .form-input {
+      background: var(--bg); border: 0.5px solid var(--border); padding: 10px;
+      border-radius: 8px; color: #fff; font-size: 13px; outline: none;
+    }
+    body.light-theme .form-input { color: #1a1a1a; }
+    .form-input:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  </style>
+</head>
+<body class="theme-purple">
+
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div>
+        <div class="logo">
+          <div class="logo-x">X</div>
+          <span class="logo-title">PROJECT X</span>
+        </div>
+        <nav>
+          <button class="nav-btn active" data-view="all"><i class="ti ti-layout-dashboard"></i> All Habits</button>
+          <button class="nav-btn" id="theme-toggle"><i class="ti ti-sun-moon"></i> Change Theme</button>
+        </nav>
+      </div>
+      <div class="sidebar-footer">
+        HABITS TRACKER<br/>v1.0.0 — PROJ X
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="main-inner">
+        
+        <!-- Header -->
+        <header class="page-header">
+          <div>
+            <h1 class="page-title">Habits Tracker</h1>
+            <p class="page-sub">Track your discipline, build consistency daily.</p>
+          </div>
+          <div>
+            <div class="clock-badge" id="live-clock">00:00:00 PM</div>
+            <div class="next-reset">Resetting in 3h 40m</div>
+          </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Completion Rate</div>
+            <div class="stat-value" id="stat-rate">0%</div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-rate" style="width: 0%"></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Habits</div>
+            <div class="stat-value" id="stat-active">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Best Streak</div>
+            <div class="stat-value" id="stat-streak">0<span class="stat-sub">days</span></div>
+          </div>
+        </section>
+
+        <!-- Actions & Filters -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div class="category-filter" id="category-filter-container">
+            <button class="category-pill active" data-category="all">All</button>
+            <button class="category-pill" data-category="health">Health</button>
+            <button class="category-pill" data-category="work">Work</button>
+            <button class="category-pill" data-category="mind">Mind</button>
+          </div>
+          <button class="add-btn" id="open-modal-btn"><i class="ti ti-plus"></i> Add Habit</button>
+        </div>
+
+        <!-- Habits List -->
+        <div class="habits-list" id="habits-container">
+          <div class="empty-state">No habits added yet. Click "+ Add Habit" to start.</div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Habit Modal -->
+  <div class="modal" id="habit-modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Create New Habit</h3>
+      <div class="form-group">
+        <label>Habit Name</label>
+        <input type="text" id="habit-name-input" class="form-input" placeholder="e.g. Morning Meditation" />
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="habit-category-input" class="form-input">
+          <option value="health">Health</option>
+          <option value="work">Work</option>
+          <option value="mind">Mind</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Difficulty (1-3)</label>
+        <select id="habit-difficulty-input" class="form-input">
+          <option value="1">Easy</option>
+          <option value="2">Medium</option>
+          <option value="3">Hard</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="close-modal-btn">Cancel</button>
+        <button class="add-btn" id="save-habit-btn">Save Habit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
