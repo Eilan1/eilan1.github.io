@@ -3,27 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#070b14">
-  <title>Habit it!</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Habit it! v4</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="ui-sleek dark">
 
   <div id="loading-screen">
     <h1>Habit it!</h1>
+    <p class="loader-sub">v4</p>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
 
+  <header class="mobile-header" id="mobile-header">
+    <a href="./index.html" class="back-btn" aria-label="Back to home">←</a>
+    <span class="mobile-title">Habit it!</span>
+    <button type="button" class="mobile-settings" id="open-settings-mobile" aria-label="Settings">⚙</button>
+  </header>
+
   <div class="app">
-    <aside class="sidebar">
-      <div class="logo">Habit it!</div>
+    <aside class="sidebar" aria-label="Sidebar">
+      <a href="./index.html" class="logo">Habit it!</a>
       <nav class="nav" id="nav"></nav>
-      <button type="button" class="settings-fab" id="open-settings" aria-label="Open settings">⚙</button>
+      <button type="button" class="settings-fab" id="open-settings" aria-label="Open settings">Settings</button>
     </aside>
 
     <main class="main" id="main-content"></main>
   </div>
+
+  <nav class="mobile-tabs" id="mobile-tabs" aria-label="Main navigation"></nav>
 
   <div class="settings-backdrop" id="settings-backdrop" hidden></div>
   <aside class="settings-panel" id="settings-panel" aria-hidden="true">
