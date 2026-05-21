@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project X</title>
+
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/dist/tabler-icons.min.css"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div id="loading-screen">
+  <div class="loader-text">BOOTING PROJECT X...</div>
+</div>
+
+<video autoplay muted loop id="wallpaper">
+  <source src="assets/wallpapers/cyberpunk.webm" type="video/webm">
+</video>
+
+<div id="particles"></div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="logo">PROJECT X</div>
+
+    <button onclick="setTab('dashboard')">Dashboard</button>
+    <button onclick="setTab('stats')">Stats</button>
+    <button onclick="setTab('analytics')">Analytics</button>
+    <button onclick="setTab('settings')">Settings</button>
+  </aside>
+
+  <main id="main-content"></main>
+
+</div>
+
+<div id="command-palette" class="hidden">
+  <input type="text" id="command-input" placeholder="Type command...">
+</div>
+
+<script src="app.js"></script>
+
+<script src="features/heatmap.js"></script>
+<script src="features/xp-system.js"></script>
+<script src="features/shortcuts.js"></script>
+<script src="features/focus-mode.js"></script>
+<script src="features/drag-sort.js"></script>
+<script src="features/charts.js"></script>
+<script src="features/cyberpunk-theme.js"></script>
+<script src="features/ambient.js"></script>
+<script src="features/command-palette.js"></script>
+<script src="features/wallpapers.js"></script>
+<script src="features/insights.js"></script>
+<script src="features/themes.js"></script>
+<script src="features/loading-screen.js"></script>
+<script src="features/performance.js"></script>
+
+</body>
+</html>
