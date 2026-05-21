@@ -1,4 +1,4 @@
-# Habits Tracker v3.0
+# Habit it!
 
 A minimal habit tracking application with daily reset, streak tracking, reminders, and achievements.
 
