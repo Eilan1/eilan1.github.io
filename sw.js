@@ -1,11 +1,13 @@
-const CACHE_NAME = "habitit-cache-v2";
+const CACHE_NAME = "habitit-cache-v4";
 
 const assets = [
   "./",
   "./index.html",
   "./app.html",
   "./style.css",
+  "./landing.css",
   "./app.js",
+  "./landing.js",
   "./manifest.json"
 ];
 
