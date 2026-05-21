@@ -1,7 +1,8 @@
-/* Habit it! — main app logic (app.html) */
+/* Habit it! v4 — app.html */
 
 const STORAGE_KEY = "habitit";
 const LEGACY_KEY = "projectx";
+const APP_VERSION = 4;
 
 let activeTab = "dashboard";
 
@@ -10,6 +11,7 @@ const state = {
   xp: 0,
   level: 1,
   theme: "dark",
+  uiStyle: "sleek",
   cyberpunk: false,
   focusMode: false,
   sounds: true,
@@ -19,10 +21,8 @@ const state = {
 window.APP = state;
 globalThis.APP = state;
 
-/* ---------------- SAVE / LOAD ---------------- */
-
 function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, v: APP_VERSION }));
 }
 
 function load() {
@@ -30,40 +30,73 @@ function load() {
   if (!raw) raw = localStorage.getItem(LEGACY_KEY);
   if (!raw) return;
   try {
-    Object.assign(state, JSON.parse(raw));
+    const data = JSON.parse(raw);
+    Object.assign(state, data);
+    if (!state.uiStyle) state.uiStyle = "sleek";
   } catch {
-    /* ignore corrupt data */
+    /* ignore */
+  }
+  applyAllStyles();
+}
+
+function applyTheme() {
+  const light = state.theme === "light";
+  document.body.classList.toggle("light", light);
+  document.body.classList.toggle("dark", !light);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    if (state.uiStyle === "sleek") {
+      meta.content = light ? "#ffffff" : "#0a0a0a";
+    } else {
+      meta.content = light ? "#f4f6fb" : "#070b14";
+    }
+  }
+}
+
+function applyUiStyle() {
+  const classic = state.uiStyle === "classic";
+  document.body.classList.toggle("ui-sleek", !classic);
+  document.body.classList.toggle("ui-classic", classic);
+  if (!classic && state.cyberpunk) {
+    state.cyberpunk = false;
+    save();
   }
   applyTheme();
-  applyFocusMode();
   applyCyberpunk();
 }
 
-/* ---------------- THEME & MODES ---------------- */
-
-function applyTheme() {
-  document.body.classList.toggle("light", state.theme === "light");
-  document.body.classList.toggle("dark", state.theme !== "light");
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = state.theme === "light" ? "#f4f6fb" : "#070b14";
-}
-
 function applyCyberpunk() {
-  document.body.classList.toggle("cyberpunk", state.cyberpunk);
+  document.body.classList.toggle("cyberpunk", state.cyberpunk && state.uiStyle === "classic");
 }
 
 function applyFocusMode() {
   document.body.classList.toggle("focus", state.focusMode);
 }
 
-function setTheme(value) {
-  state.theme = value;
+function applyAllStyles() {
+  applyUiStyle();
+  applyFocusMode();
+}
+
+function setTheme(light) {
+  state.theme = light ? "light" : "dark";
   applyTheme();
   save();
   syncSettingsToggles();
 }
 
+function setUiStyle(classic) {
+  state.uiStyle = classic ? "classic" : "sleek";
+  applyUiStyle();
+  save();
+  syncSettingsToggles();
+  renderNav();
+  render();
+  renderSettingsPanel();
+}
+
 function setCyberpunk(on) {
+  if (state.uiStyle !== "classic") return;
   state.cyberpunk = on;
   applyCyberpunk();
   save();
@@ -89,8 +122,6 @@ function setConfirmDelete(on) {
   syncSettingsToggles();
 }
 
-/* ---------------- SETTINGS PANEL ---------------- */
-
 function openSettings() {
   const panel = document.getElementById("settings-panel");
   const backdrop = document.getElementById("settings-backdrop");
@@ -112,15 +143,16 @@ function closeSettings() {
   setTimeout(() => { backdrop.hidden = true; }, 200);
 }
 
-function toggleRow(id, label, desc, checked, onChange) {
+function toggleRow(id, label, desc, checked, disabled) {
+  const dis = disabled ? "disabled" : "";
   return `
-    <div class="setting-row">
+    <div class="setting-row ${disabled ? "disabled" : ""}">
       <div class="setting-label">
         <span>${label}</span>
         ${desc ? `<small>${desc}</small>` : ""}
       </div>
       <label class="toggle" for="${id}">
-        <input type="checkbox" id="${id}" ${checked ? "checked" : ""}>
+        <input type="checkbox" id="${id}" ${checked ? "checked" : ""} ${dis}>
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
       </label>
     </div>
@@ -130,20 +162,23 @@ function toggleRow(id, label, desc, checked, onChange) {
 function renderSettingsPanel() {
   const body = document.getElementById("settings-body");
   if (!body) return;
+  const isClassic = state.uiStyle === "classic";
 
   body.innerHTML = `
-    ${toggleRow("toggle-light", "Light theme", "Bright, clean interface", state.theme === "light", null)}
-    ${toggleRow("toggle-cyber", "Cyberpunk mode", "Neon grid & scanlines", state.cyberpunk, null)}
-    ${toggleRow("toggle-focus", "Focus mode", "Hide distractions", state.focusMode, null)}
-    ${toggleRow("toggle-sounds", "Sound effects", "UI feedback sounds", state.sounds, null)}
-    ${toggleRow("toggle-confirm", "Confirm delete", "Ask before removing habits", state.confirmDelete, null)}
+    ${toggleRow("toggle-light", "Light theme", "Black & white (sleek) or bright (classic)", state.theme === "light")}
+    ${toggleRow("toggle-classic", "Classic UI", "Colorful gradients — off for sleek B&W", isClassic)}
+    ${toggleRow("toggle-cyber", "Cyberpunk", "Classic UI only", state.cyberpunk, !isClassic)}
+    ${toggleRow("toggle-focus", "Focus mode", "Hide extra panels", state.focusMode)}
+    ${toggleRow("toggle-sounds", "Sounds", "Not implemented yet", state.sounds)}
+    ${toggleRow("toggle-confirm", "Confirm delete", null, state.confirmDelete)}
     <div class="setting-row setting-meta">
-      <span>Level ${state.level}</span>
+      <span>v${APP_VERSION} · Level ${state.level}</span>
       <span>${state.xp} XP</span>
     </div>
   `;
 
-  bindToggle("toggle-light", (on) => setTheme(on ? "light" : "dark"));
+  bindToggle("toggle-light", (on) => setTheme(on));
+  bindToggle("toggle-classic", (on) => setUiStyle(on));
   bindToggle("toggle-cyber", setCyberpunk);
   bindToggle("toggle-focus", setFocusMode);
   bindToggle("toggle-sounds", setSounds);
@@ -152,13 +187,14 @@ function renderSettingsPanel() {
 
 function bindToggle(id, handler) {
   const el = document.getElementById(id);
-  if (!el) return;
+  if (!el || el.disabled) return;
   el.onchange = () => handler(el.checked);
 }
 
 function syncSettingsToggles() {
   const map = {
     "toggle-light": state.theme === "light",
+    "toggle-classic": state.uiStyle === "classic",
     "toggle-cyber": state.cyberpunk,
     "toggle-focus": state.focusMode,
     "toggle-sounds": state.sounds,
@@ -166,11 +202,11 @@ function syncSettingsToggles() {
   };
   for (const [id, on] of Object.entries(map)) {
     const el = document.getElementById(id);
-    if (el && el.checked !== on) el.checked = on;
+    if (el && !el.disabled && el.checked !== on) el.checked = on;
   }
+  const cyber = document.getElementById("toggle-cyber");
+  if (cyber) cyber.disabled = state.uiStyle !== "classic";
 }
-
-/* ---------------- XP ---------------- */
 
 function gainXP(amount) {
   state.xp += amount;
@@ -186,6 +222,19 @@ function renderXP() {
   if (!bar) return;
   const needed = state.level * 100;
   const percent = Math.min(100, (state.xp / needed) * 100);
+  const sleek = state.uiStyle === "sleek";
+
+  if (sleek) {
+    bar.innerHTML = `
+      <div class="sleek-xp">
+        <span>Lv ${state.level}</span>
+        <div class="sleek-xp-track"><div class="sleek-xp-fill" style="width:${percent}%"></div></div>
+        <span class="sleek-xp-num">${state.xp}/${needed}</span>
+      </div>
+    `;
+    return;
+  }
+
   bar.innerHTML = `
     <div class="card xp-card">
       <div class="xp-header">
@@ -199,12 +248,10 @@ function renderXP() {
   `;
 }
 
-/* ---------------- TABS ---------------- */
-
 const TABS = [
-  { id: "dashboard", label: "Today" },
-  { id: "stats", label: "Stats" },
-  { id: "analytics", label: "Insights" }
+  { id: "dashboard", label: "Today", icon: "○" },
+  { id: "stats", label: "Stats", icon: "◇" },
+  { id: "analytics", label: "Insights", icon: "◆" }
 ];
 
 function setTab(tab) {
@@ -214,28 +261,41 @@ function setTab(tab) {
 }
 
 function renderNav() {
-  const nav = document.getElementById("nav");
-  if (!nav) return;
-  nav.innerHTML = TABS.map((t) => `
+  const html = TABS.map((t) => `
     <button type="button" class="${activeTab === t.id ? "active" : ""}" data-tab="${t.id}">
-      ${t.label}
+      <span class="tab-icon">${t.icon}</span>
+      <span class="tab-label">${t.label}</span>
     </button>
   `).join("");
-  nav.querySelectorAll("[data-tab]").forEach((btn) => {
-    btn.onclick = () => setTab(btn.dataset.tab);
-  });
+
+  const nav = document.getElementById("nav");
+  const mobile = document.getElementById("mobile-tabs");
+  if (nav) {
+    nav.innerHTML = html;
+    nav.querySelectorAll("[data-tab]").forEach((btn) => {
+      btn.onclick = () => setTab(btn.dataset.tab);
+    });
+  }
+  if (mobile) {
+    mobile.innerHTML = html;
+    mobile.querySelectorAll("[data-tab]").forEach((btn) => {
+      btn.onclick = () => setTab(btn.dataset.tab);
+    });
+  }
 }
 
-/* ---------------- HABITS ---------------- */
+function todayLabel() {
+  return new Date().toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric"
+  });
+}
 
 function addHabit() {
   const name = prompt("Habit name");
   if (!name || !name.trim()) return;
-  state.habits.push({
-    id: Date.now(),
-    name: name.trim(),
-    done: false
-  });
+  state.habits.push({ id: Date.now(), name: name.trim(), done: false });
   gainXP(25);
   save();
   render();
@@ -248,6 +308,7 @@ function markHabitDone(id) {
   gainXP(10);
   save();
   renderHabits();
+  updateSleekSummary();
   renderInsightsIfVisible();
 }
 
@@ -257,6 +318,7 @@ function markHabitUndone(id) {
   habit.done = false;
   save();
   renderHabits();
+  updateSleekSummary();
   renderInsightsIfVisible();
 }
 
@@ -269,32 +331,37 @@ function deleteHabit(id) {
   render();
 }
 
+function updateSleekSummary() {
+  const el = document.getElementById("sleek-summary");
+  if (!el) return;
+  const total = state.habits.length;
+  const done = state.habits.filter((h) => h.done).length;
+  el.textContent = total ? `${done} / ${total} done` : "No habits yet";
+}
+
 function renderHabits() {
   const container = document.getElementById("habits");
   if (!container) return;
+  const sleek = state.uiStyle === "sleek";
 
   if (state.habits.length === 0) {
-    container.innerHTML = `
-      <div class="card empty-habits">
-        <p>No habits yet. Add one to get started.</p>
-      </div>
-    `;
+    container.innerHTML = `<p class="empty-habits">${sleek ? "Tap + Add habit" : "No habits yet. Add one to get started."}</p>`;
     return;
   }
 
   container.innerHTML = state.habits.map((h) => `
     <div class="habit-wrap" data-id="${h.id}">
-      <div class="habit-bg-left"><span>Done</span></div>
-      <div class="habit-bg-right"><span>Undo</span></div>
+      <div class="habit-bg-left"><span>${sleek ? "✓" : "Done"}</span></div>
+      <div class="habit-bg-right"><span>${sleek ? "↩" : "Undo"}</span></div>
       <div class="habit-card ${h.done ? "done" : ""}" data-habit-id="${h.id}">
         <div class="habit-left">
-          <div class="habit-check"></div>
+          <div class="habit-check" aria-hidden="true"></div>
           <div class="habit-info">
             <h3>${escapeHtml(h.name)}</h3>
-            <p>${h.done ? "Completed today" : "Swipe left to complete"}</p>
+            ${sleek ? "" : `<p>${h.done ? "Completed" : "Swipe left to complete"}</p>`}
           </div>
         </div>
-        <button type="button" class="btn-ghost" data-delete="${h.id}" aria-label="Delete habit">✕</button>
+        <button type="button" class="btn-ghost" data-delete="${h.id}" aria-label="Delete">✕</button>
       </div>
     </div>
   `).join("");
@@ -316,14 +383,12 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-/* Swipe: left = done, right = undo */
 function bindSwipe(card) {
   const wrap = card.closest(".habit-wrap");
   const id = Number(card.dataset.habitId);
   let startX = 0;
   let currentX = 0;
   let dragging = false;
-
   const threshold = 72;
   const maxDrag = 120;
 
@@ -334,49 +399,22 @@ function bindSwipe(card) {
     wrap.classList.toggle("swipe-right-hint", clamped > 24);
   }
 
-  function reset(snapBack = true) {
-    if (snapBack) {
-      card.style.transition = "transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1)";
-      card.style.transform = "";
-      setTimeout(() => { card.style.transition = ""; }, 200);
-    }
+  function reset() {
+    card.style.transition = "transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1)";
+    card.style.transform = "";
+    setTimeout(() => { card.style.transition = ""; }, 200);
     wrap.classList.remove("swipe-left-hint", "swipe-right-hint");
     dragging = false;
-  }
-
-  function onStart(clientX) {
-    dragging = true;
-    startX = clientX;
-    currentX = 0;
-    card.style.transition = "none";
-  }
-
-  function onMove(clientX) {
-    if (!dragging) return;
-    currentX = clientX - startX;
-    setOffset(currentX);
   }
 
   function onEnd() {
     if (!dragging) return;
     if (currentX <= -threshold) {
-      card.style.transform = "translateX(-100%)";
-      card.style.opacity = "0";
-      setTimeout(() => {
-        markHabitDone(id);
-        card.style.opacity = "";
-        card.style.transform = "";
-      }, 180);
+      markHabitDone(id);
     } else if (currentX >= threshold) {
-      card.style.transform = "translateX(100%)";
-      card.style.opacity = "0";
-      setTimeout(() => {
-        markHabitUndone(id);
-        card.style.opacity = "";
-        card.style.transform = "";
-      }, 180);
+      markHabitUndone(id);
     } else {
-      reset(true);
+      reset();
     }
     dragging = false;
   }
@@ -384,21 +422,23 @@ function bindSwipe(card) {
   card.addEventListener("pointerdown", (e) => {
     if (e.target.closest("[data-delete]")) return;
     card.setPointerCapture(e.pointerId);
-    onStart(e.clientX);
+    dragging = true;
+    startX = e.clientX;
+    currentX = 0;
+    card.style.transition = "none";
   });
   card.addEventListener("pointermove", (e) => {
     if (!dragging) return;
-    onMove(e.clientX);
+    currentX = e.clientX - startX;
+    setOffset(currentX);
   });
   card.addEventListener("pointerup", onEnd);
-  card.addEventListener("pointercancel", () => reset(true));
+  card.addEventListener("pointercancel", reset);
 }
-
-/* ---------------- HEATMAP / CHARTS / INSIGHTS ---------------- */
 
 function renderHeatmap() {
   const heatmap = document.getElementById("heatmap");
-  if (!heatmap) return;
+  if (!heatmap || state.uiStyle === "sleek") return;
   const doneCount = state.habits.filter((h) => h.done).length;
   const ratio = state.habits.length ? doneCount / state.habits.length : 0;
   let cells = "";
@@ -407,10 +447,7 @@ function renderHeatmap() {
     cells += `<div class="heat-cell" style="opacity:${intensity}"></div>`;
   }
   heatmap.innerHTML = `
-    <div class="card">
-      <h2>Activity</h2>
-      <div class="heat-grid">${cells}</div>
-    </div>
+    <div class="card"><h2>Activity</h2><div class="heat-grid">${cells}</div></div>
   `;
 }
 
@@ -421,21 +458,22 @@ function renderCharts() {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.parentElement?.clientWidth || 400;
   canvas.width = w * dpr;
-  canvas.height = 220 * dpr;
+  canvas.height = 200 * dpr;
   canvas.style.width = `${w}px`;
-  canvas.style.height = "220px";
+  canvas.style.height = "200px";
   ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, w, 220);
-  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#7c5cff";
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 3;
+  ctx.clearRect(0, 0, w, 200);
+  const sleek = state.uiStyle === "sleek";
+  ctx.strokeStyle = sleek
+    ? getComputedStyle(document.body).getPropertyValue("--text").trim() || "#fff"
+    : getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#7c5cff";
+  ctx.lineWidth = sleek ? 2 : 3;
   ctx.lineJoin = "round";
-  ctx.lineCap = "round";
   const points = [30, 90, 55, 130, 100, 175, 150];
   ctx.beginPath();
   points.forEach((p, i) => {
     const x = 24 + i * ((w - 48) / (points.length - 1));
-    const y = 200 - p;
+    const y = 180 - p;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
@@ -448,40 +486,50 @@ function renderInsights() {
   const total = state.habits.length;
   const completed = state.habits.filter((h) => h.done).length;
   let text = "Add habits and swipe left when you finish one.";
-  if (total > 0 && completed === total) text = "Perfect day — every habit completed.";
-  else if (completed === 0 && total > 0) text = "Nothing done yet. Swipe left on a habit to mark it complete.";
-  else if (completed > 0) text = `${completed} of ${total} habits done today. Keep going.`;
-  insights.innerHTML = `
-    <div class="card insight-card">
-      <h2>Today's insight</h2>
-      <p>${text}</p>
-    </div>
-  `;
+  if (total > 0 && completed === total) text = "All habits done today.";
+  else if (completed === 0 && total > 0) text = "Swipe left on a habit to complete it.";
+  else if (completed > 0) text = `${completed} of ${total} done today.`;
+  const wrap = state.uiStyle === "sleek" ? "sleek-insight" : "card insight-card";
+  insights.innerHTML = `<div class="${wrap}"><h2>Insight</h2><p>${text}</p></div>`;
 }
 
 function renderInsightsIfVisible() {
   if (activeTab === "analytics") renderInsights();
 }
 
-/* ---------------- MAIN RENDER ---------------- */
-
 function render() {
   const main = document.getElementById("main-content");
   if (!main) return;
+  const sleek = state.uiStyle === "sleek";
 
   if (activeTab === "dashboard") {
-    main.innerHTML = `
-      <div class="page-header card">
-        <div>
-          <h1>Today</h1>
-          <p class="muted">Swipe <strong>left</strong> to complete · <strong>right</strong> to undo</p>
+    if (sleek) {
+      const total = state.habits.length;
+      const done = state.habits.filter((h) => h.done).length;
+      main.innerHTML = `
+        <header class="sleek-hero">
+          <p class="sleek-date">${todayLabel()}</p>
+          <p class="sleek-summary" id="sleek-summary">${total ? `${done} / ${total} done` : "No habits yet"}</p>
+        </header>
+        <div id="xp-bar"></div>
+        <button type="button" class="sleek-add-btn" onclick="addHabit()">+ Add habit</button>
+        <div id="habits" class="habits-list"></div>
+        <p class="swipe-hint">Swipe left · complete · right · undo</p>
+      `;
+    } else {
+      main.innerHTML = `
+        <div class="page-header card">
+          <div>
+            <h1>Today</h1>
+            <p class="muted">Swipe <strong>left</strong> complete · <strong>right</strong> undo</p>
+          </div>
+          <button type="button" class="btn-primary" onclick="addHabit()">+ Habit</button>
         </div>
-        <button type="button" class="btn-primary" onclick="addHabit()">+ Habit</button>
-      </div>
-      <div id="xp-bar"></div>
-      <div id="habits"></div>
-      <div id="heatmap"></div>
-    `;
+        <div id="xp-bar"></div>
+        <div id="habits"></div>
+        <div id="heatmap"></div>
+      `;
+    }
     renderHabits();
     renderXP();
     renderHeatmap();
@@ -489,9 +537,8 @@ function render() {
 
   if (activeTab === "stats") {
     main.innerHTML = `
-      <div class="card">
-        <h1>Stats</h1>
-        <p class="muted">Completion trend</p>
+      <div class="${sleek ? "sleek-panel" : "card"}">
+        <h1 class="panel-title">Stats</h1>
         <canvas id="statsChart"></canvas>
       </div>
     `;
@@ -504,23 +551,26 @@ function render() {
   }
 }
 
-/* ---------------- STARTUP ---------------- */
+function bindSettingsButtons() {
+  const open = () => openSettings();
+  document.getElementById("open-settings")?.addEventListener("click", open);
+  document.getElementById("open-settings-mobile")?.addEventListener("click", open);
+  document.getElementById("close-settings")?.addEventListener("click", closeSettings);
+  document.getElementById("settings-backdrop")?.addEventListener("click", closeSettings);
+}
 
 window.addEventListener("load", () => {
   load();
   renderNav();
   render();
-
-  document.getElementById("open-settings")?.addEventListener("click", openSettings);
-  document.getElementById("close-settings")?.addEventListener("click", closeSettings);
-  document.getElementById("settings-backdrop")?.addEventListener("click", closeSettings);
+  bindSettingsButtons();
 
   const loader = document.getElementById("loading-screen");
   if (loader) {
     setTimeout(() => {
       loader.classList.add("hide");
       setTimeout(() => loader.remove(), 400);
-    }, 900);
+    }, 700);
   }
 });
 
