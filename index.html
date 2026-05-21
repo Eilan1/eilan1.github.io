@@ -1,566 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Habit Tracker v3.0 - Track your daily habits, build streaks, and unlock achievements">
-    <meta name="theme-color" content="#6366f1">
-    <title>Habit Tracker v3.0 - Build Better Habits</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT X</title>
 
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #8b5cf6;
-            --accent: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg: #0f172a;
-            --bg-alt: #1e293b;
-            --bg-card: #334155;
-            --text: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --border: #475569;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+<link rel="stylesheet" href="style.css">
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-alt) 100%);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+<style>
 
-        /* Navigation */
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+body{
+font-family:Inter,sans-serif;
+background:#070b14;
+color:white;
+overflow-x:hidden;
+}
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-        }
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at top left,#7c5cff22,transparent 30%),
+radial-gradient(circle at bottom right,#00d4ff22,transparent 30%);
+pointer-events:none;
+z-index:-1;
+}
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
+nav{
+position:sticky;
+top:0;
+z-index:1000;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 60px;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(20px);
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
 
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+.logo{
+font-size:1.8rem;
+font-weight:900;
+letter-spacing:3px;
+background:linear-gradient(45deg,#7c5cff,#00d4ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-        .nav-links a:hover {
-            color: var(--primary);
-        }
+.nav-links{
+display:flex;
+gap:30px;
+}
 
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-        }
+.nav-links a{
+text-decoration:none;
+color:#ccc;
+transition:0.2s;
+}
 
-        /* Header Hero */
-        .hero {
-            max-width: 1200px;
-            margin: 4rem auto 0;
-            padding: 4rem 2rem 2rem;
-            text-align: center;
-        }
+.nav-links a:hover{
+color:white;
+}
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
+.hero{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:60px;
+position:relative;
+overflow:hidden;
+}
 
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+.hero-content{
+max-width:1200px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:60px;
+align-items:center;
+}
 
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 4rem;
-        }
+.hero-text h1{
+font-size:5rem;
+line-height:1;
+margin-bottom:25px;
+font-weight:900;
+}
 
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
+.hero-text h1 span{
+background:linear-gradient(45deg,#7c5cff,#00d4ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
+.hero-text p{
+font-size:1.2rem;
+line-height:1.7;
+color:#9aa4b2;
+margin-bottom:35px;
+max-width:600px;
+}
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
-        }
+.hero-buttons{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
 
-        .btn-secondary {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
+.btn{
+padding:16px 30px;
+border:none;
+border-radius:18px;
+cursor:pointer;
+font-size:1rem;
+font-weight:700;
+transition:0.25s;
+text-decoration:none;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
 
-        .btn-secondary:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+.btn-primary{
+background:linear-gradient(45deg,#7c5cff,#00d4ff);
+color:white;
+box-shadow:0 10px 40px rgba(124,92,255,0.4);
+}
 
-        /* Features Section */
-        .features {
-            max-width: 1200px;
-            margin: 6rem auto;
-            padding: 0 2rem;
-        }
+.btn-primary:hover{
+transform:translateY(-4px) scale(1.03);
+}
 
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 3rem;
-        }
+.btn-secondary{
+background:#151f36;
+color:white;
+border:1px solid rgba(255,255,255,0.08);
+}
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
+.btn-secondary:hover{
+background:#1d2947;
+}
 
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
+.hero-preview{
+background:rgba(255,255,255,0.03);
+border:1px solid rgba(255,255,255,0.06);
+padding:25px;
+border-radius:30px;
+backdrop-filter:blur(20px);
+box-shadow:0 30px 80px rgba(0,0,0,0.4);
+}
 
-        .feature-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
-        }
+.preview-top{
+display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+}
 
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
+.preview-dot{
+width:12px;
+height:12px;
+border-radius:50%;
+background:#7c5cff;
+}
 
-        .feature-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
+.preview-card{
+background:#11182d;
+padding:20px;
+border-radius:20px;
+margin-bottom:18px;
+transition:0.25s;
+}
 
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
+.preview-card:hover{
+transform:translateX(8px);
+}
 
-        /* Stats Section */
-        .stats {
-            max-width: 1200px;
-            margin: 6rem auto;
-            padding: 0 2rem;
-            background: var(--bg-card);
-            border-radius: 1.5rem;
-            padding: 3rem 2rem;
-            border: 1px solid var(--border);
-        }
+.preview-card.done{
+background:linear-gradient(45deg,#00c896,#00d4ff);
+color:black;
+}
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
+.preview-card h3{
+margin-bottom:6px;
+}
 
-        .stat-item h4 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:20px;
+margin-top:30px;
+}
 
-        .stat-item p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
+.stat{
+background:#11182d;
+padding:24px;
+border-radius:22px;
+text-align:center;
+border:1px solid rgba(255,255,255,0.05);
+}
 
-        /* How It Works */
-        .how-it-works {
-            max-width: 1200px;
-            margin: 6rem auto;
-            padding: 0 2rem;
-        }
+.stat h2{
+font-size:2rem;
+margin-bottom:8px;
+background:linear-gradient(45deg,#7c5cff,#00d4ff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
+.features{
+padding:120px 60px;
+max-width:1400px;
+margin:auto;
+}
 
-        .step {
-            position: relative;
-            padding-left: 60px;
-        }
+.section-title{
+text-align:center;
+font-size:3rem;
+margin-bottom:70px;
+}
 
-        .step-number {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:28px;
+}
 
-        .step h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
+.feature{
+background:#11182d;
+padding:35px;
+border-radius:28px;
+border:1px solid rgba(255,255,255,0.05);
+transition:0.25s;
+position:relative;
+overflow:hidden;
+}
 
-        .step p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
+.feature::before{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(45deg,#7c5cff22,#00d4ff11);
+opacity:0;
+transition:0.25s;
+}
 
-        /* Demo Section */
-        .demo {
-            max-width: 1200px;
-            margin: 6rem auto;
-            padding: 0 2rem;
-        }
+.feature:hover::before{
+opacity:1;
+}
 
-        .demo-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-        }
+.feature:hover{
+transform:translateY(-8px);
+border-color:#7c5cff66;
+}
 
-        .demo-text h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
+.feature-icon{
+font-size:2.5rem;
+margin-bottom:20px;
+}
 
-        .demo-text p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
+.feature h3{
+font-size:1.4rem;
+margin-bottom:12px;
+}
 
-        .demo-image {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border-radius: 1rem;
-            padding: 2rem;
-            border: 1px solid var(--border);
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+.feature p{
+color:#9aa4b2;
+line-height:1.7;
+}
 
-        .demo-image p {
-            color: var(--text-tertiary);
-        }
+.cta{
+padding:120px 40px;
+text-align:center;
+}
 
-        @media (max-width: 768px) {
-            .demo-content {
-                grid-template-columns: 1fr;
-            }
+.cta-box{
+max-width:900px;
+margin:auto;
+padding:70px;
+border-radius:40px;
+background:linear-gradient(45deg,#11182d,#1a2647);
+border:1px solid rgba(255,255,255,0.06);
+}
 
-            .hero h1 {
-                font-size: 2rem;
-            }
+.cta-box h2{
+font-size:3rem;
+margin-bottom:20px;
+}
 
-            .section-title {
-                font-size: 1.75rem;
-            }
-        }
+.cta-box p{
+color:#9aa4b2;
+margin-bottom:35px;
+font-size:1.1rem;
+}
 
-        /* CTA Section */
-        .cta {
-            max-width: 1200px;
-            margin: 6rem auto;
-            padding: 3rem 2rem;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid var(--primary);
-            border-radius: 1.5rem;
-            text-align: center;
-        }
+footer{
+padding:40px;
+text-align:center;
+color:#7e8794;
+border-top:1px solid rgba(255,255,255,0.05);
+}
 
-        .cta h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
+.floating-orb{
+position:absolute;
+border-radius:50%;
+filter:blur(80px);
+opacity:0.4;
+animation:float 8s infinite ease-in-out;
+}
 
-        .cta p {
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
+.orb1{
+width:300px;
+height:300px;
+background:#7c5cff;
+top:-100px;
+left:-100px;
+}
 
-        /* Footer */
-        footer {
-            background: var(--bg-alt);
-            border-top: 1px solid var(--border);
-            padding: 3rem 2rem;
-            margin-top: 6rem;
-            text-align: center;
-            color: var(--text-secondary);
-        }
+.orb2{
+width:240px;
+height:240px;
+background:#00d4ff;
+bottom:-100px;
+right:-80px;
+animation-delay:2s;
+}
 
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+@keyframes float{
+0%{
+transform:translateY(0px);
+}
+50%{
+transform:translateY(30px);
+}
+100%{
+transform:translateY(0px);
+}
+}
 
-        .footer-links {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
+@media(max-width:900px){
 
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+.hero-content{
+grid-template-columns:1fr;
+}
 
-        .footer-links a:hover {
-            color: var(--primary);
-        }
+.hero-text h1{
+font-size:3rem;
+}
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.stats{
+grid-template-columns:1fr 1fr;
+}
 
-        .hero, .features, .stats, .how-it-works, .demo, .cta {
-            animation: fadeInUp 0.8s ease-out;
-        }
+nav{
+padding:20px;
+}
 
-        .feature-card {
-            animation: fadeInUp 0.8s ease-out;
-            animation-fill-mode: both;
-        }
+.features{
+padding:80px 20px;
+}
 
-        .feature-card:nth-child(1) { animation-delay: 0.1s; }
-        .feature-card:nth-child(2) { animation-delay: 0.2s; }
-        .feature-card:nth-child(3) { animation-delay: 0.3s; }
-        .feature-card:nth-child(4) { animation-delay: 0.4s; }
-        .feature-card:nth-child(5) { animation-delay: 0.5s; }
-        .feature-card:nth-child(6) { animation-delay: 0.6s; }
-    </style>
+}
+
+</style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <a href="#" class="logo">🎯 Habit Tracker</a>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#cta">Get Started</a></li>
-            </ul>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Build Better Habits</h1>
-        <p class="hero-subtitle">Track daily habits, build streaks, unlock achievements, and transform your life</p>
-        <div class="hero-buttons">
-            <a href="https://eilan1.github.io/habitstracker/habitstracker-v3.html" class="btn btn-primary">Launch App</a>
-            <a href="#features" class="btn btn-secondary">Learn More</a>
-        </div>
-    </section>
+<div class="floating-orb orb1"></div>
+<div class="floating-orb orb2"></div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <h2 class="section-title">Powerful Features</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Track Progress</h3>
-                <p>Monitor your daily completions with intuitive swipe gestures. Simple, fast, and satisfying.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔥</div>
-                <h3>Build Streaks</h3>
-                <p>Watch your streaks grow. The visual feedback motivates you to keep the momentum going.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🏆</div>
-                <h3>Earn Badges</h3>
-                <p>Unlock achievements at key milestones. Celebrate your consistency and progress.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3>Customize</h3>
-                <p>Choose from multiple themes and color schemes to match your style.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3>Works Offline</h3>
-                <p>All data stored locally. No internet needed. Your data stays private and secure.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⏰</div>
-                <h3>Smart Reminders</h3>
-                <p>Get notified at the perfect time. Set custom reminder schedules for each habit.</p>
-            </div>
-        </div>
-    </section>
+<nav>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <h4>11K+</h4>
-                <p>Active Users</p>
-            </div>
-            <div class="stat-item">
-                <h4>500K+</h4>
-                <p>Habits Tracked</p>
-            </div>
-            <div class="stat-item">
-                <h4>50M+</h4>
-                <p>Days Completed</p>
-            </div>
-            <div class="stat-item">
-                <h4>99.9%</h4>
-                <p>Uptime</p>
-            </div>
-        </div>
-    </section>
+<div class="logo">
+PROJECT X
+</div>
 
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <h2 class="section-title">How It Works</h2>
-        <div class="steps-grid">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Create Habits</h3>
-                <p>Add your habits with names, categories, and difficulty levels. Organize your goals.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>Track Daily</h3>
-                <p>Swipe right to mark done, left for missed. Quick feedback keeps you engaged.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Build Streaks</h3>
-                <p>Watch your streak counter grow. Consistency is rewarded with visual progress.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <h3>Achieve More</h3>
-                <p>Unlock badges and achievements as you hit milestones. Track detailed analytics.</p>
-            </div>
-        </div>
-    </section>
+<div class="nav-links">
+<a href="#features">Features</a>
+<a href="#stats">Stats</a>
+<a href="#launch">Launch</a>
+</div>
 
-    <!-- Demo Section -->
-    <section class="demo">
-        <div class="demo-content">
-            <div class="demo-text">
-                <h2>Stay Motivated</h2>
-                <p>Get detailed analytics showing your success rate, daily completions, and performance trends across all categories.</p>
-                <p>Set reminders for each habit and receive notifications at the perfect time to keep you on track.</p>
-                <p>Export your data anytime and backup your progress. Your habits, your data, your control.</p>
-            </div>
-            <div class="demo-image">
-                <p>📈 Analytics Dashboard Preview</p>
-            </div>
-        </div>
-    </section>
+</nav>
 
-    <!-- CTA Section -->
-    <section class="cta" id="cta">
-        <h2>Ready to Transform Your Life?</h2>
-        <p>Start tracking your habits today. Free, no signup required. Completely private.</p>
-        <a href="https://eilan1.github.io/habitstracker/habitstracker-v3.html" class="btn btn-primary">Launch the App</a>
-    </section>
+<section class="hero">
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="https://github.com/Eilan1/eilan1.github.io">GitHub</a>
-                <a href="#">Contact</a>
-            </div>
-            <p>&copy; 2024 Habit Tracker. Made with ❤️</p>
-        </div>
-    </footer>
+<div class="hero-content">
+
+<div class="hero-text">
+
+<h1>
+Build Better
+<span>Systems</span>
+</h1>
+
+<p>
+PROJECT X is a futuristic habit tracker focused on streaks, progression, focus systems, XP leveling, analytics, and immersive productivity.
+</p>
+
+<div class="hero-buttons">
+
+<a class="btn btn-primary" href="./app.html">
+Launch App
+</a>
+
+<a class="btn btn-secondary" href="#features">
+View Features
+</a>
+
+</div>
+
+<div class="stats" id="stats">
+
+<div class="stat">
+<h2>11K+</h2>
+<p>Users</p>
+</div>
+
+<div class="stat">
+<h2>1.2M+</h2>
+<p>Habits</p>
+</div>
+
+<div class="stat">
+<h2>98%</h2>
+<p>Consistency</p>
+</div>
+
+<div class="stat">
+<h2>24/7</h2>
+<p>Offline Access</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="hero-preview">
+
+<div class="preview-top">
+
+<div class="preview-dot"></div>
+
+<div class="preview-dot"></div>
+
+<div class="preview-dot"></div>
+
+</div>
+
+<div class="preview-card done">
+<h3>Morning Workout</h3>
+<p>+50 XP Earned</p>
+</div>
+
+<div class="preview-card">
+<h3>Read 20 Pages</h3>
+<p>Pending Completion</p>
+</div>
+
+<div class="preview-card done">
+<h3>Deep Work Session</h3>
+<p>2 Hour Focus Streak</p>
+</div>
+
+<div class="preview-card">
+<h3>Sleep Schedule</h3>
+<p>Reminder Active</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="features" id="features">
+
+<h2 class="section-title">
+Core Features
+</h2>
+
+<div class="grid">
+
+<div class="feature">
+<div class="feature-icon">🔥</div>
+<h3>XP & Leveling</h3>
+<p>
+Gain experience points, level up, unlock ranks, and build long-term momentum through progression systems.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">📊</div>
+<h3>Analytics</h3>
+<p>
+Detailed charts, completion tracking, habit consistency analysis, and smart insight systems.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">🎯</div>
+<h3>Focus Mode</h3>
+<p>
+Minimal distraction environment built for deep work sessions and concentrated productivity.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">🌌</div>
+<h3>Cyberpunk Themes</h3>
+<p>
+Dynamic themes, RGB visuals, glowing interfaces, and futuristic UI customization systems.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">⚡</div>
+<h3>Performance Optimized</h3>
+<p>
+Fast rendering, offline support, smooth animations, and GitHub Pages optimized architecture.
+</p>
+</div>
+
+<div class="feature">
+<div class="feature-icon">📱</div>
+<h3>PWA Support</h3>
+<p>
+Installable app experience with offline caching and mobile-first responsive support.
+</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="cta" id="launch">
+
+<div class="cta-box">
+
+<h2>
+Start Building Discipline
+</h2>
+
+<p>
+Launch PROJECT X and begin tracking habits, leveling up, and optimizing your daily systems.
+</p>
+
+<a class="btn btn-primary" href="./app.html">
+Open PROJECT X
+</a>
+
+</div>
+
+</section>
+
+<footer>
+PROJECT X © 2026
+</footer>
+
 </body>
 </html>
