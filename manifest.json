@@ -1,7 +1,7 @@
 {
   "name": "Habit it!",
   "short_name": "Habit it!",
-  "description": "Swipe habits done. Level up. Stay consistent.",
+  "description": "Habit it! v4 — sleek B&W or classic UI. Swipe to complete.",
   "display": "standalone",
   "start_url": "./app.html",
   "background_color": "#070b14",
