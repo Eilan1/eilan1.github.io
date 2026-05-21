@@ -1,0 +1,130 @@
+body{
+  margin:0;
+  background:#050505;
+  color:white;
+  font-family:sans-serif;
+  overflow:hidden;
+}
+
+#wallpaper{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.15;
+  z-index:-3;
+}
+
+#particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-2;
+}
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+.sidebar{
+  width:220px;
+  background:#0f0f12;
+  border-right:1px solid #222;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sidebar button{
+  background:#18181b;
+  color:white;
+  border:none;
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.sidebar button:hover{
+  background:#222;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:20px;
+}
+
+#main-content{
+  flex:1;
+  overflow:auto;
+  padding:30px;
+}
+
+.card{
+  background:#101014;
+  border:1px solid #222;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.hidden{
+  display:none;
+}
+
+#command-palette{
+  position:fixed;
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  width:600px;
+  background:#0f0f12;
+  border:1px solid #333;
+  border-radius:14px;
+  padding:20px;
+  z-index:9999;
+}
+
+#command-input{
+  width:100%;
+  background:black;
+  color:white;
+  border:none;
+  padding:15px;
+  border-radius:10px;
+}
+
+#loading-screen{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+}
+
+.loader-text{
+  font-size:30px;
+  font-weight:900;
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+  0%{opacity:.3}
+  50%{opacity:1}
+  100%{opacity:.3}
+}
+
+.cyberpunk-mode{
+  background:black;
+  color:#00ffee;
+}
+
+.cyberpunk-mode .card{
+  border-color:#00ffee;
+  box-shadow:0 0 20px #00ffee33;
+}
