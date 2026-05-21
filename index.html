@@ -1,66 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Project X</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="manifest" href="manifest.json"/>
+<title>PROJECT X</title>
 
-  <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/dist/tabler-icons.min.css"/>
+<style>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#090909;
+  color:white;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
+}
+
+body.cyberpunk{
+  background:#050510;
+  color:cyan;
+}
+
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:240px;
+  background:#111;
+  border-right:1px solid #222;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:30px;
+  color:cyan;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.nav button{
+  background:#181818;
+  border:none;
+  color:white;
+  padding:14px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
+  font-size:15px;
+}
+
+.nav button:hover{
+  background:cyan;
+  color:black;
+  transform:translateX(4px);
+}
+
+body.cyberpunk .nav button{
+  border:1px solid cyan;
+  box-shadow:0 0 10px cyan;
+}
+
+/* MAIN */
+
+.main{
+  flex:1;
+  overflow:auto;
+  padding:30px;
+}
+
+.card{
+  background:#111;
+  border:1px solid #222;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:20px;
+}
+
+body.cyberpunk .card{
+  border:1px solid cyan;
+  box-shadow:0 0 12px rgba(0,255,255,0.4);
+}
+
+/* HABITS */
+
+.habit-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+button{
+  background:cyan;
+  color:black;
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+#xp-bar{
+  margin-bottom:20px;
+}
+
+h1{
+  margin-bottom:15px;
+}
+
+h2{
+  margin-bottom:10px;
+}
+
+p{
+  opacity:0.8;
+}
+
+/* LOADING */
+
+#loading-screen{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  font-size:40px;
+  font-weight:900;
+  color:cyan;
+  transition:0.5s;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:cyan;
+  border-radius:20px;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+  .sidebar{
+    width:90px;
+    padding:10px;
+  }
+
+  .logo{
+    font-size:18px;
+  }
+
+  .nav button{
+    font-size:12px;
+    padding:10px;
+  }
+
+  .main{
+    padding:15px;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
 
 <div id="loading-screen">
-  <div class="loader-text">BOOTING PROJECT X...</div>
+  BOOTING PROJECT X
 </div>
-
-<video autoplay muted loop id="wallpaper">
-  <source src="assets/wallpapers/cyberpunk.webm" type="video/webm">
-</video>
-
-<div id="particles"></div>
 
 <div class="app">
 
-  <aside class="sidebar">
-    <div class="logo">PROJECT X</div>
+  <div class="sidebar">
 
-    <button onclick="setTab('dashboard')">Dashboard</button>
-    <button onclick="setTab('stats')">Stats</button>
-    <button onclick="setTab('analytics')">Analytics</button>
-    <button onclick="setTab('settings')">Settings</button>
-  </aside>
+    <div class="logo">
+      PROJECT X
+    </div>
 
-  <main id="main-content"></main>
+    <div class="nav">
+
+      <button onclick="setTab('dashboard')">
+        Dashboard
+      </button>
+
+      <button onclick="setTab('stats')">
+        Stats
+      </button>
+
+      <button onclick="setTab('analytics')">
+        Analytics
+      </button>
+
+      <button onclick="setTab('settings')">
+        Settings
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="main" id="main-content">
+
+  </div>
 
 </div>
 
-<div id="command-palette" class="hidden">
-  <input type="text" id="command-input" placeholder="Type command...">
-</div>
-
-<script src="app.js"></script>
-
-<script src="features/heatmap.js"></script>
-<script src="features/xp-system.js"></script>
-<script src="features/shortcuts.js"></script>
-<script src="features/focus-mode.js"></script>
-<script src="features/drag-sort.js"></script>
-<script src="features/charts.js"></script>
-<script src="features/cyberpunk-theme.js"></script>
-<script src="features/ambient.js"></script>
-<script src="features/command-palette.js"></script>
-<script src="features/wallpapers.js"></script>
-<script src="features/insights.js"></script>
-<script src="features/themes.js"></script>
-<script src="features/loading-screen.js"></script>
-<script src="features/performance.js"></script>
+<script src="./app.js"></script>
 
 </body>
 </html>
