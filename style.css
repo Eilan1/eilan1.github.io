@@ -105,6 +105,7 @@ body{
   align-items:center;
   justify-content:center;
   z-index:99999;
+  transition: opacity .5s ease;
 }
 
 .loader-text{
