@@ -1,9 +1,16 @@
-window.addEventListener("load", ()=>{
+window.addEventListener("load", () => {
 
-  setTimeout(()=>{
+  const loader = document.getElementById("loading-screen");
 
-    document.getElementById("loading-screen").style.display = "none";
+  if (!loader) return;
 
-  },1500);
+  setTimeout(() => {
+    loader.style.opacity = "0";
+
+    setTimeout(() => {
+      loader.remove();
+    }, 500);
+
+  }, 1200);
 
 });
