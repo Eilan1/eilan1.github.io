@@ -12,6 +12,7 @@ function save(){
 
 function load(){
   const data = localStorage.getItem("projectx");
+
   if(data){
     Object.assign(state, JSON.parse(data));
   }
@@ -22,16 +23,30 @@ function setTab(tab){
   render();
 }
 
+/* SAFE FALLBACKS */
+
+window.renderXP = window.renderXP || function(){};
+window.renderHeatmap = window.renderHeatmap || function(){};
+window.renderCharts = window.renderCharts || function(){};
+window.renderInsights = window.renderInsights || function(){};
+
 function render(){
 
   const main = document.getElementById("main-content");
+
+  if(!main) return;
+
+  /* DASHBOARD */
 
   if(activeTab === "dashboard"){
 
     main.innerHTML = `
       <div class="card">
         <h1>Dashboard</h1>
-        <button onclick="addHabit()">Add Habit</button>
+
+        <button onclick="addHabit()">
+          Add Habit
+        </button>
       </div>
 
       <div id="xp-bar"></div>
@@ -42,33 +57,51 @@ function render(){
     `;
 
     renderHabits();
-    renderXP();
-    renderHeatmap();
+
+    if(window.renderXP){
+      renderXP();
+    }
+
+    if(window.renderHeatmap){
+      renderHeatmap();
+    }
   }
+
+  /* STATS */
 
   if(activeTab === "stats"){
 
     main.innerHTML = `
       <div class="card">
         <h1>Stats</h1>
+
         <canvas id="statsChart"></canvas>
       </div>
     `;
 
-    renderCharts();
+    if(window.renderCharts){
+      renderCharts();
+    }
   }
+
+  /* ANALYTICS */
 
   if(activeTab === "analytics"){
 
     main.innerHTML = `
       <div class="card">
         <h1>AI Insights</h1>
+
         <div id="insights"></div>
       </div>
     `;
 
-    renderInsights();
+    if(window.renderInsights){
+      renderInsights();
+    }
   }
+
+  /* SETTINGS */
 
   if(activeTab === "settings"){
 
@@ -80,6 +113,8 @@ function render(){
           Toggle Cyberpunk
         </button>
 
+        <br><br>
+
         <button onclick="toggleFocusMode()">
           Focus Mode
         </button>
@@ -88,6 +123,8 @@ function render(){
   }
 }
 
+/* ADD HABIT */
+
 function addHabit(){
 
   const name = prompt("Habit name");
@@ -95,20 +132,26 @@ function addHabit(){
   if(!name) return;
 
   state.habits.push({
-    id:Date.now(),
+    id: Date.now(),
     name,
     done:false
   });
 
-  gainXP(25);
+  if(window.gainXP){
+    gainXP(25);
+  }
 
   save();
   render();
 }
 
+/* RENDER HABITS */
+
 function renderHabits(){
 
   const container = document.getElementById("habits");
+
+  if(!container) return;
 
   container.innerHTML = state.habits.map(h=>`
     <div class="card">
@@ -117,11 +160,23 @@ function renderHabits(){
   `).join("");
 }
 
+/* STARTUP */
+
 load();
-render();
 
 window.APP = state;
+globalThis.APP = state;
+
+render();
+
+/* SERVICE WORKER */
 
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js");
+
+  navigator.serviceWorker
+    .register("./sw.js")
+    .catch(err=>{
+      console.log("SW FAILED", err);
+    });
+
 }
