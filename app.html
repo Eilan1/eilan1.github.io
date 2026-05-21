@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070b14">
+  <title>Habit it!</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="loading-screen">
+    <h1>Habit it!</h1>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">Habit it!</div>
+      <nav class="nav" id="nav"></nav>
+      <button type="button" class="settings-fab" id="open-settings" aria-label="Open settings">⚙</button>
+    </aside>
+
+    <main class="main" id="main-content"></main>
+  </div>
+
+  <div class="settings-backdrop" id="settings-backdrop" hidden></div>
+  <aside class="settings-panel" id="settings-panel" aria-hidden="true">
+    <header class="settings-header">
+      <h2>Settings</h2>
+      <button type="button" class="icon-btn" id="close-settings" aria-label="Close settings">✕</button>
+    </header>
+    <div class="settings-body" id="settings-body"></div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
