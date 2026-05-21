@@ -1,7 +1,7 @@
-[README.md](https://github.com/user-attachments/files/28105488/README.md)
-# Habit it!
+[README.md](https://github.com/user-attachments/files/28108496/README.md)
+# Habit it! v4
 
-A lightweight habit tracker that runs entirely in your browser. Swipe habits complete, level up with XP, and tune the UI with light/dark themes, focus mode, and optional cyberpunk styling — no account, no backend.
+A lightweight habit tracker that runs entirely in your browser. **v4** defaults to a **sleek black & white UI** (light/dark). Switch to **Classic** in Settings for the colorful gradient UI. Mobile: back button, bottom tabs, safe areas. No account, no backend.
 
 ## Live links
 
@@ -10,20 +10,14 @@ A lightweight habit tracker that runs entirely in your browser. Swipe habits com
 | **App** | [eilan1.github.io/app.html](https://eilan1.github.io/app.html) |
 | **Landing** | [eilan1.github.io](https://eilan1.github.io/) |
 
-## Features (current)
+## Features (v4)
 
-- **Habit list** — Add habits by name, mark complete, delete (optional confirm)
-- **Swipe gestures** — Swipe **left** to complete · swipe **right** to undo
-- **XP & levels** — Earn XP when you add and complete habits
-- **Today dashboard** — Habits, XP bar, and activity heatmap
-- **Stats** — Simple completion trend chart
-- **Insights** — Short daily summary based on today’s progress
-- **Settings panel** — Slider-style toggles (not buttons):
-  - Light / dark theme
-  - Cyberpunk mode
-  - Focus mode (dims non-essential UI)
-  - Sound effects toggle *(UI only — no audio yet)*
-  - Confirm before delete
+- **Two UI modes** — **Sleek** (default, B&W minimal) or **Classic** (gradients, heatmap, cyberpunk)
+- **Habit list** — Add by name, swipe **left** complete · **right** undo
+- **XP & levels** — Earn XP on add/complete
+- **Mobile** — ← Back to home, bottom tab bar, 44px touch targets, `safe-area` padding
+- **Landing** — Hamburger menu on small screens, fixed layout overflow
+- **Settings** — Slider toggles: light theme, classic UI, focus, confirm delete; cyberpunk (classic only)
 - **Offline** — Works without internet; data stays in your browser
 - **PWA-ready** — `manifest.json` + service worker for caching
 
