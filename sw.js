@@ -1,22 +1,34 @@
-const CACHE_NAME = "projectx-cache-v1";
+const CACHE_NAME = "habitit-cache-v2";
 
 const assets = [
   "./",
   "./index.html",
+  "./app.html",
   "./style.css",
-  "./app.js"
+  "./app.js",
+  "./manifest.json"
 ];
 
-self.addEventListener("install", e=>{
+self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME)
-    .then(cache=>cache.addAll(assets))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(assets))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener("fetch", e=>{
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request)
-    .then(res=>res || fetch(e.request))
+    caches.match(e.request).then((res) => res || fetch(e.request))
   );
 });
